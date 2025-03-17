@@ -19,9 +19,6 @@
 		"main": [
 			"me.danvb10.mossify.Mossify"
 		],
-		"fabric-datagen": [
-			"me.danvb10.mossify.MossifyDataGenerator"
-		],
 		"client": [
 			"me.danvb10.mossify.MossifyClient"
 		]
