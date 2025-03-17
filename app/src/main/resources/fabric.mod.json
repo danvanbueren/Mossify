@@ -25,6 +25,14 @@
 			"me.danvb10.mossify.MossifyClient"
 		]
 	},
+	"custom" : {
+		"modmenu" : {
+			"links" : {
+				"modmenu.github_releases" : "https://github.com/danvanbueren/Mossify/releases",
+				"modmenu.modrinth" : "https://modrinth.com/mod/mossify"
+			}
+		}
+	},
 	"mixins": [
 		"mossify.mixins.json"
 	],
