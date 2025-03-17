@@ -3,17 +3,18 @@
 	"id": "mossify",
 	"version": "${version}",
 	"name": "Mossify",
-	"description": "A client-side Fabric mod for Minecraft. Generates and renders procedural 'moss' atop blocks to give additional graphical depth to natural blocks. Does not affect gameplay or logic.",
+	"description": "Mossify generates and renders procedural 'moss' atop blocks to give additional depth to natural blocks. It only runs on the client, affecting graphics but not gameplay or logic.",
 	"authors": [
 		"danvb10"
 	],
 	"contact": {
 		"homepage": "https://github.com/danvanbueren",
-		"sources": "https://github.com/danvanbueren/Mossify"
+		"sources": "https://github.com/danvanbueren/Mossify",
+		"issues": "https://github.com/danvanbueren/Mossify/issues"
 	},
 	"license": "GPL-3.0",
 	"icon": "assets/mossify/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"main": [
 			"me.danvb10.mossify.Mossify"
@@ -41,8 +42,5 @@
 		"minecraft": "~1.21.4",
 		"java": ">=21",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }
