@@ -16,9 +16,6 @@
 	"icon": "assets/mossify/icon.png",
 	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"me.danvb10.mossify.Mossify"
-		],
 		"client": [
 			"me.danvb10.mossify.MossifyClient"
 		]
