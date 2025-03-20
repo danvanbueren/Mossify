@@ -15,13 +15,24 @@ import org.joml.Vector3f;
 
 public class PrimitiveRenderer {
 
-    public static void drawCube(WorldRenderContext context, BlockPos position, float size, Sprite sprite, int r, int g, int b, int a) {
+    public static void drawCube(
+            WorldRenderContext context,
+            BlockPos position,
+            int positionOffsetX, int positionOffsetY, int positionOffsetZ,
+            float size,
+            Sprite sprite,
+            int r, int g, int b, int a
+    ) {
 
         MinecraftClient client = MinecraftClient.getInstance();
 
         if (client.world == null) return;
 
         size /= 32.0f; //size is scaled such as 1 unit is 1/16th of a block. This means a size of 16 is a full standard block.
+
+        float scaledPositionOffsetX = positionOffsetX / 16.0f;
+        float scaledPositionOffsetY = positionOffsetY / 16.0f;
+        float scaledPositionOffsetZ = positionOffsetZ / 16.0f;
 
         // Start
         MatrixStack matrixStack = context.matrixStack();
@@ -30,9 +41,9 @@ public class PrimitiveRenderer {
 
         // Move to world space
         matrixStack.translate(
-                position.getX() - context.camera().getPos().x + size,
-                position.getY() - context.camera().getPos().y + size,
-                position.getZ() - context.camera().getPos().z + size
+                position.getX() - context.camera().getPos().x + size + scaledPositionOffsetX,
+                position.getY() - context.camera().getPos().y + size + scaledPositionOffsetY,
+                position.getZ() - context.camera().getPos().z + size + scaledPositionOffsetZ
         );
 
         // Get VertexConsumerProvider
@@ -40,12 +51,25 @@ public class PrimitiveRenderer {
         if (consumers == null) return;
 
         // Define UV texture coords dynamically
-        float uMin = sprite.getMinU(), vMin = sprite.getMinV(), uMax = sprite.getMaxU(), vMax = sprite.getMaxV();
+        float uMin = sprite.getMinU(),
+                vMin = sprite.getMinV(),
+                uMax = sprite.getMaxU(),
+                vMax = sprite.getMaxV();
 
         // Adjust UV scaling based on size
-        float texScale = size * 2; // size is in 1/16th of a block, so adjust accordingly
+        float texScale = size * 2;
         uMax = uMin + (uMax - uMin) * texScale;
         vMax = vMin + (vMax - vMin) * texScale;
+
+        /*
+
+        Strange... trying to offset the texture to match the base texture, while avoiding spillage into other sprites, but not working
+
+        uMin += positionOffsetX % (size + positionOffsetX);
+        vMin += positionOffsetY % (size + positionOffsetY);
+        uMax += positionOffsetX % (size + positionOffsetX);
+        vMax += positionOffsetY % (size + positionOffsetY);
+        */
 
         // Render textures
         VertexConsumer vertexConsumer = consumers.getBuffer(RenderLayer.getCutout());
@@ -65,6 +89,7 @@ public class PrimitiveRenderer {
         drawQuad(matrixStack, vertexConsumer, size, uMin, vMin, uMax, vMax,
                 new Quaternionf(),
                 new Vector3f(0, 0, 1),
+                positionOffsetX, positionOffsetY, positionOffsetZ,
                 light001, light101, light111, light011,
                 r, g, b, a, 0, 0, 1);
 
@@ -72,6 +97,7 @@ public class PrimitiveRenderer {
         drawQuad(matrixStack, vertexConsumer, size, uMin, vMin, uMax, vMax,
                 new Quaternionf().rotateY((float) Math.toRadians(180)),
                 new Vector3f(0, 0, -1),
+                positionOffsetX, positionOffsetY, positionOffsetZ,
                 light000, light100, light110, light010,
                 r, g, b, a, 0, 0, -1);
 
@@ -79,6 +105,7 @@ public class PrimitiveRenderer {
         drawQuad(matrixStack, vertexConsumer, size, uMin, vMin, uMax, vMax,
                 new Quaternionf().rotateY((float) Math.toRadians(90)),
                 new Vector3f(1, 0, 0),
+                positionOffsetX, positionOffsetY, positionOffsetZ,
                 light100, light101, light111, light110,
                 r, g, b, a, 1, 0, 0);
 
@@ -86,6 +113,7 @@ public class PrimitiveRenderer {
         drawQuad(matrixStack, vertexConsumer, size, uMin, vMin, uMax, vMax,
                 new Quaternionf().rotateY((float) Math.toRadians(-90)),
                 new Vector3f(-1, 0, 0),
+                positionOffsetX, positionOffsetY, positionOffsetZ,
                 light000, light001, light011, light010,
                 r, g, b, a, -1, 0, 0);
 
@@ -93,6 +121,7 @@ public class PrimitiveRenderer {
         drawQuad(matrixStack, vertexConsumer, size, uMin, vMin, uMax, vMax,
                 new Quaternionf().rotateX((float) Math.toRadians(90)),
                 new Vector3f(0, -1, 0),
+                positionOffsetX, positionOffsetY, positionOffsetZ,
                 light000, light100, light101, light001,
                 r, g, b, a, 0, -1, 0);
 
@@ -100,6 +129,7 @@ public class PrimitiveRenderer {
         drawQuad(matrixStack, vertexConsumer, size, uMin, vMin, uMax, vMax,
                 new Quaternionf().rotateX((float) Math.toRadians(-90)),
                 new Vector3f(0, 1, 0),
+                positionOffsetX, positionOffsetY, positionOffsetZ,
                 light010, light110, light111, light011,
                 r, g, b, a, 0, 1, 0);
 
@@ -114,6 +144,7 @@ public class PrimitiveRenderer {
             float uMin, float vMin, float uMax, float vMax, //texture coords
             Quaternionf rotation, //rotate
             Vector3f translation, //translate
+            int positionOffsetX, int positionOffsetY, int positionOffsetZ,
             int l_00, int l_10, int l_11, int l_01, //light
             int r, int g, int b, int a, //color
             int n_x, int n_y, int n_z //normal vector

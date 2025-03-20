@@ -24,6 +24,7 @@ public class MossRenderer {
         for (int x = -10; x <= 10; x++) {
             for (int y = -3; y <= 3; y++) {
                 for (int z = -10; z <= 10; z++) {
+
                     BlockPos thisBlockPosition = PLAYER_POSITION.add(x, y, z);
                     BlockPos underBlockPosition = PLAYER_POSITION.add(x, y - 1, z);
 
@@ -53,9 +54,15 @@ public class MossRenderer {
                         g = (color >> 8) & 0xFF;
                         b = color & 0xFF;
                     }
-                    
-                    float size = 2f;
-                    drawCube(context, thisBlockPosition, size, sprite, r, g, b, a);
+
+                    // Size CANNOT be greater than 16f
+                    float size = 3f;
+                    int positionOffsetX = 0,
+                        positionOffsetY = 0,
+                        positionOffsetZ = 0;
+
+                    drawCube(context, thisBlockPosition, positionOffsetX,positionOffsetY,positionOffsetZ, size, sprite, r, g, b, a);
+
                 }
             }
         }
