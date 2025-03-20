@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
+import static me.danvb10.mossify.Commands.registerCommands;
+
 public class MossifyClient implements ClientModInitializer {
 
     // Mod ID
@@ -26,6 +28,11 @@ public class MossifyClient implements ClientModInitializer {
     // Player position
     public static BlockPos PLAYER_POSITION;
 
+    // Enable/disable entire mod
+    public static boolean isEnabled = true;
+
+    // Effect radius
+    public static int renderDistance = 20;
 
     public static final Set<Block> ALLOWED_TEXTURES = Set.of(
             Blocks.GRASS_BLOCK,
@@ -73,8 +80,10 @@ public class MossifyClient implements ClientModInitializer {
 
         CLIENT = MinecraftClient.getInstance();
 
+        registerCommands();
+
         // Register the MossRenderer to run
-        WorldRenderEvents.AFTER_ENTITIES.register(MossRenderer::render);
+        WorldRenderEvents.AFTER_ENTITIES.register(MossRenderer::renderEntrypoint);
 
     }
 }

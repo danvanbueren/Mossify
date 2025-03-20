@@ -5,29 +5,33 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 
 import static me.danvb10.mossify.MossifyClient.*;
 import static me.danvb10.mossify.render.PrimitiveRenderer.drawCube;
 
 public class MossRenderer {
 
-    public static void render(WorldRenderContext context) {
+    public static void renderEntrypoint(WorldRenderContext context) {
+        if (!isEnabled) return;
+
         long startTime = System.currentTimeMillis();
+        if (!isSafeToRender()) return;
+        renderLoop(context);
+        long endTime = System.currentTimeMillis();
+        // System.out.println("Render time: " + (endTime - startTime) + "ms -- Average: x?ms");
+    }
 
+    public static boolean isSafeToRender() {
         MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player == null) return false;
+        if (client.world == null) return false;
+        return true;
+    }
 
-        if (client.player == null) return;
-        if (client.world == null) return;
-
+    public static void renderLoop(WorldRenderContext context) {
+        MinecraftClient client = MinecraftClient.getInstance();
         PLAYER_POSITION = client.player.getBlockPos();
 /*
         // FRUSTUM CULLING START
@@ -56,11 +60,9 @@ public class MossRenderer {
         // FRUSTUM CULLING END
 */
         int hologramsRendered = 0;
-
-        for (int x = -10; x <= 10; x++) {
-            for (int y = -3; y <= 3; y++) {
-                for (int z = -10; z <= 10; z++) {
-
+        for (int x = -renderDistance; x <= renderDistance; x++) {
+            for (int y = -renderDistance/5; y <= renderDistance/5; y++) {
+                for (int z = -renderDistance; z <= renderDistance; z++) {
                     BlockPos thisBlockPosition = PLAYER_POSITION.add(x, y, z);
                     BlockPos underBlockPosition = PLAYER_POSITION.add(x, y - 1, z);
 
@@ -78,13 +80,10 @@ public class MossRenderer {
 
                     BlockState thisBlockState = client.world.getBlockState(thisBlockPosition);
                     BlockState underBlockState = client.world.getBlockState(underBlockPosition);
-
                     Block thisBlock = thisBlockState.getBlock();
                     Block underBlock = underBlockState.getBlock();
-
                     if (!ALLOWED_TEXTURES.contains(underBlock)) continue;
                     if (!ALLOWED_ENVIRONMENTS.contains(thisBlock)) continue;
-
                     hologramsRendered++;
 
                     int r = 255;
@@ -109,8 +108,8 @@ public class MossRenderer {
                     // Size CANNOT be greater than 16f
                     float size = 3f;
                     int positionOffsetX = 0,
-                        positionOffsetY = 0,
-                        positionOffsetZ = 0;
+                            positionOffsetY = 0,
+                            positionOffsetZ = 0;
 
                     drawCube(context, thisBlockPosition, positionOffsetX,positionOffsetY,positionOffsetZ, size, sprite, r, g, b, a);
 
@@ -118,9 +117,6 @@ public class MossRenderer {
             }
         }
 
-        long endTime = System.currentTimeMillis();
-
         System.out.println("Holograms rendered this cycle: " + hologramsRendered);
-        // System.out.println("Render time: " + (endTime - startTime) + "ms -- Average: x?ms");
     }
 }
