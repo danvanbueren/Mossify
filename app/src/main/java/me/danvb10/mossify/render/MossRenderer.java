@@ -78,6 +78,8 @@ public class MossRenderer {
                     // Frustum Culling END
                     */
 
+                    assert client.world != null;
+
                     BlockState thisBlockState = client.world.getBlockState(thisBlockPosition);
                     BlockState underBlockState = client.world.getBlockState(underBlockPosition);
                     Block thisBlock = thisBlockState.getBlock();
